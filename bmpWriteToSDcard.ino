@@ -23,6 +23,11 @@ void setup() {
   if (!SD.begin(18)) {
   Serial.println("initialization failed!");
   while (1);
+
+    if(SD.exists("data.csv")){
+    SD.remove("data.csv");
+  }
+  
   }
 
   
@@ -33,7 +38,7 @@ void setup() {
     
     //bmp.begin(BMP280_ADDRESS_ALT, BMP280_CHIPID);
     //status = bmp.begin(BMP280_ADDRESS_ALT, BMP280_CHIPID);
-    status = bmp.begin();
+  status = bmp.begin();
     
     if (!status) {
       Serial.println(F("Could not find a valid BMP280 sensor, check wiring or "
@@ -63,21 +68,25 @@ void loop() {
   bmp_temp->getEvent(&temp_event);
   bmp_pressure->getEvent(&pressure_event);
 
-  if(SD.exists("CANSAT_DATA.txt")){
-    SD.remove("CANSAT_DATA.txt");
-  }
-  myFile = SD.open("CANSAT_DATA.txt", FILE_WRITE);
+
+  myFile = SD.open("data.csv", FILE_WRITE);
+  int fishSense = analogRead(A1);
 
   if (myFile) {
-    myFile.print("Temp: ");
+    //myFile.print("Temp: ");
     myFile.print(temp_event.temperature);
     myFile.print("\t");
-    myFile.print("Pres: ");
+    //myFile.print("Pres: ");
+ 
     myFile.println(pressure_event.pressure);
+
+    myFile.println(fishSense);
   
     Serial.print(temp_event.temperature);
     Serial.print(",");
-    Serial.println(pressure_event.pressure);
+    Serial.print(pressure_event.pressure);
+    Serial.print(",");
+    Serial.println(fishSense);
   
    myFile.close();
 
