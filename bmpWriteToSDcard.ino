@@ -3,7 +3,8 @@
 #include <SD.h>
 #include <SoftwareSerial.h>
 #include <Adafruit_BMP280.h>
-//#include <RTClib.h>
+//#include <RTClib.h> //GET THE FLIPPING RTC CLOCK WORKING BECAUSE ITS NOT !!!!!!!
+// GET THE NECESARY RTC LIBRARIES AND IF POSSIBLE GET TEMP DATA FROM RTC BOARD
 
 
 File myFile;
