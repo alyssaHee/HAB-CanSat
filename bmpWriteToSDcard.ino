@@ -3,8 +3,6 @@
 #include <SD.h>
 #include <SoftwareSerial.h>
 #include <Adafruit_BMP280.h>
-//#include <RTClib.h> //GET THE FLIPPING RTC CLOCK WORKING BECAUSE ITS NOT !!!!!!!
-// GET THE NECESARY RTC LIBRARIES AND IF POSSIBLE GET TEMP DATA FROM RTC BOARD
 
 
 File myFile;
@@ -15,25 +13,34 @@ Adafruit_Sensor *bmp_pressure = bmp.getPressureSensor();
 
 
 void setup() {
+  /*
   // Open serial communications and wait for port to open:
   Serial.begin(9600);
   while (!Serial) {
   ; // wait for serial port to connect. Needed for native USB port only
   }
-  Serial.print("Initializing SD card...");
+  */
+
+  
+  
+  
+  //Serial.print("Initializing SD card...");
   if (!SD.begin(18)) {
-  Serial.println("initialization failed!");
+  //Serial.println("initialization failed!");
   while (1);
 
-    if(SD.exists("data.csv")){
+  if(SD.exists("data.csv")){
     SD.remove("data.csv");
+
+   
+    
   }
   
   }
 
-  
-  
-  Serial.println(" SD IS CHILL :3");
+    // Setup Serial connection
+
+  //Serial.println(" SD IS CHILL :3");
  
   unsigned status;
     
@@ -42,8 +49,8 @@ void setup() {
   status = bmp.begin();
     
     if (!status) {
-      Serial.println(F("Could not find a valid BMP280 sensor, check wiring or "
-                         "try a different address!"));
+      //Serial.println(F("Could not find a valid BMP280 sensor, check wiring or "
+                         //"try a different address!"));
       while (1) 
       delay(10);
     }
@@ -58,7 +65,7 @@ void setup() {
                   Adafruit_BMP280::STANDBY_MS_500); /* Standby time. */
 
 
-  Serial.println("initialization done. :3");
+  //Serial.println("initialization done. :3");
 }
 
 
@@ -82,12 +89,16 @@ void loop() {
     myFile.println(pressure_event.pressure);
 
     myFile.println(fishSense);
-  
-    Serial.print(temp_event.temperature);
-    Serial.print(",");
-    Serial.print(pressure_event.pressure);
-    Serial.print(",");
-    Serial.println(fishSense);
+    //Serial.println(rtc.getSecond());
+
+
+    // Wait one second before repeating
+    delay (1000);
+    //Serial.print(temp_event.temperature);
+    //Serial.print(",");
+    //Serial.print(pressure_event.pressure);
+    //Serial.print(",");
+    //Serial.println(fishSense);
   
    myFile.close();
 
@@ -95,7 +106,7 @@ void loop() {
   } 
   else {
   // if the file didn't open, print an error:
-  Serial.println("error opening CANSAT_DATA.txt");
+  //Serial.println("error opening CANSAT_DATA.txt");
   }
 
 }
