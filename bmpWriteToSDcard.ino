@@ -3,7 +3,12 @@
 #include <SD.h>
 #include <SoftwareSerial.h>
 #include <Adafruit_BMP280.h>
+#include <RTClib.h>
 
+#define LED_PIN 5
+
+RTC_DS3231 rtc;
+char daysOfTheWeek[7][12] = {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
 
 File myFile;
 
@@ -13,34 +18,28 @@ Adafruit_Sensor *bmp_pressure = bmp.getPressureSensor();
 
 
 void setup() {
-  /*
+  Wire.begin();  //sets up the I2C
+  rtc.begin(); 
+  //rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
+ 
   // Open serial communications and wait for port to open:
-  Serial.begin(9600);
+  //Serial.begin(9600);
+  /*
   while (!Serial) {
   ; // wait for serial port to connect. Needed for native USB port only
   }
-  */
-
-  
-  
+ */
   
   //Serial.print("Initializing SD card...");
   if (!SD.begin(18)) {
-  //Serial.println("initialization failed!");
-  while (1);
-
-  if(SD.exists("data.csv")){
-    SD.remove("data.csv");
-
-   
-    
+  //println("initialization failed!");
+    while (1);
+    delay(10);
   }
   
+  if(SD.exists("DATA.csv")){
+    SD.remove("DATA.csv");
   }
-
-    // Setup Serial connection
-
-  //Serial.println(" SD IS CHILL :3");
  
   unsigned status;
     
@@ -49,9 +48,8 @@ void setup() {
   status = bmp.begin();
     
     if (!status) {
-      //Serial.println(F("Could not find a valid BMP280 sensor, check wiring or "
-                         //"try a different address!"));
-      while (1) 
+      //Serial.println(F("Could not find a valid BMP280 sensor, check wiring or try a different address!"));
+      while (1);
       delay(10);
     }
     
@@ -66,47 +64,98 @@ void setup() {
 
 
   //Serial.println("initialization done. :3");
+
+  if (! rtc.begin()) {
+    //Serial.println("Couldn't find RTC");
+    //Serial.flush();
+    while (1);
+    delay(10);
+  }
+
+  pinMode(LED_PIN, OUTPUT);
+  
 }
 
 
 
 void loop() {
+  
   sensors_event_t temp_event, pressure_event;
 
   bmp_temp->getEvent(&temp_event);
   bmp_pressure->getEvent(&pressure_event);
-
+  DateTime now = rtc.now();
 
   myFile = SD.open("data.csv", FILE_WRITE);
   int fishSense = analogRead(A1);
 
+  delay (1000);
+  digitalWrite(LED_PIN, HIGH);
+  
   if (myFile) {
     //myFile.print("Temp: ");
     myFile.print(temp_event.temperature);
     myFile.print("\t");
-    //myFile.print("Pres: ");
- 
-    myFile.println(pressure_event.pressure);
+    myFile.print(pressure_event.pressure);
+    myFile.print("\t");
+    myFile.print(fishSense);
+    myFile.print("\t");
 
-    myFile.println(fishSense);
-    //Serial.println(rtc.getSecond());
-
-
+    myFile.print(now.day(), DEC);
+    myFile.print(" ");
+    myFile.print(now.hour(), DEC);
+    myFile.print(':');
+    myFile.print(now.minute(), DEC);
+    myFile.print(':');
+    myFile.print(now.second(), DEC);
+    myFile.println();    
+    
     // Wait one second before repeating
     delay (1000);
-    //Serial.print(temp_event.temperature);
-    //Serial.print(",");
-    //Serial.print(pressure_event.pressure);
-    //Serial.print(",");
-    //Serial.println(fishSense);
-  
-   myFile.close();
-
-   delay(2000);
+    
+    /*
+    Serial.print(temp_event.temperature);
+    Serial.print(",");
+    Serial.print(pressure_event.pressure);
+    Serial.print(",");
+    Serial.println(fishSense);
+    */
+    
+    myFile.close();
+    digitalWrite(LED_PIN, LOW);
+    
+   
   } 
+
+  /*
   else {
   // if the file didn't open, print an error:
   //Serial.println("error opening CANSAT_DATA.txt");
   }
+  */
+    
+    /*
+    Serial.print(now.year(), DEC);
+    Serial.print('/');
+    Serial.print(now.month(), DEC);
+    Serial.print('/');
+    Serial.print(now.day(), DEC);
+    Serial.print(" (");
+    Serial.print(daysOfTheWeek[now.dayOfTheWeek()]);
+    Serial.print(") ");
+    Serial.print(now.hour(), DEC);
+    Serial.print(':');
+    Serial.print(now.minute(), DEC);
+    Serial.print(':');
+    Serial.print(now.second(), DEC);
+    Serial.println();
 
+    Serial.print("Temperature: ");
+    Serial.print(rtc.getTemperature());
+    Serial.println(" C");
+
+    Serial.println();
+    */
+    
+    
 }
