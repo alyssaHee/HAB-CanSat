@@ -36,11 +36,11 @@ void setup() {
     while (1);
     delay(10);
   }
-  
+  /*
   if(SD.exists("DATA.csv")){
     SD.remove("DATA.csv");
   }
- 
+ */
   unsigned status;
     
     //bmp.begin(BMP280_ADDRESS_ALT, BMP280_CHIPID);
@@ -72,6 +72,7 @@ void setup() {
     delay(10);
   }
 
+
   pinMode(LED_PIN, OUTPUT);
   
 }
@@ -81,12 +82,17 @@ void setup() {
 void loop() {
   
   sensors_event_t temp_event, pressure_event;
-
+  
   bmp_temp->getEvent(&temp_event);
-  bmp_pressure->getEvent(&pressure_event);
+  bmp_pressure->getEvent(&pres sure_event);
   DateTime now = rtc.now();
-
-  myFile = SD.open("data.csv", FILE_WRITE);
+  
+  static String fileName = String(now.day()) + String(now.hour()) + String(now.minute()) + String(now.second())+ ".csv";
+  //String fileName = "JOOOOOOO8.csv";
+  //String fileName = String(now.day()) + String(now.hour()) + String(now.minute()) + String(now.second())+ ".csv";
+  //String(now.day(), DEC)+ String(now.hour(), DEC) +"-"+ String(now.minute(), DEC) +":"+ String(now.second(), DEC) +
+  
+  myFile = SD.open(fileName, FILE_WRITE);
   int fishSense = analogRead(A1);
 
   delay (1000);
@@ -95,11 +101,11 @@ void loop() {
   if (myFile) {
     //myFile.print("Temp: ");
     myFile.print(temp_event.temperature);
-    myFile.print("\t");
+    myFile.print(",");
     myFile.print(pressure_event.pressure);
-    myFile.print("\t");
+    myFile.print(",");
     myFile.print(fishSense);
-    myFile.print("\t");
+    myFile.print(",");
 
     myFile.print(now.day(), DEC);
     myFile.print(" ");
