@@ -4,7 +4,17 @@
 #include <SoftwareSerial.h>
 #include <Adafruit_BMP280.h>
 #include <RTClib.h>
+//#include <dht.h>
 
+
+const int fs = A1;
+const int four = A3;
+const int seven = A2;
+const int nine = A0;
+
+dht DHT;
+
+#define DHT11_PIN 6
 #define LED_PIN 5
 
 RTC_DS3231 rtc;
@@ -31,7 +41,7 @@ void setup() {
  */
   
   //Serial.print("Initializing SD card...");
-  if (!SD.begin(18)) {
+  if (!SD.begin(7)) {
   //println("initialization failed!");
     while (1);
     delay(10);
@@ -84,29 +94,44 @@ void loop() {
   sensors_event_t temp_event, pressure_event;
   
   bmp_temp->getEvent(&temp_event);
-  bmp_pressure->getEvent(&pres sure_event);
+  bmp_pressure->getEvent(&pressure_event);
   DateTime now = rtc.now();
   
   static String fileName = String(now.day()) + String(now.hour()) + String(now.minute()) + String(now.second())+ ".csv";
-  //String fileName = "JOOOOOOO8.csv";
-  //String fileName = String(now.day()) + String(now.hour()) + String(now.minute()) + String(now.second())+ ".csv";
-  //String(now.day(), DEC)+ String(now.hour(), DEC) +"-"+ String(now.minute(), DEC) +":"+ String(now.second(), DEC) +
   
   myFile = SD.open(fileName, FILE_WRITE);
-  int fishSense = analogRead(A1);
+  int fishSense = analogRead(fs);
+  int fishNine = analogRead(nine);
+  int fishFour = analogRead(four);
+  int fishSeven = analogRead(seven);
+
+  int chk = DHT.read11(DHT11_PIN);
 
   delay (1000);
   digitalWrite(LED_PIN, HIGH);
   
   if (myFile) {
     //myFile.print("Temp: ");
+    myFile.print(rtc.getTemperature());
+    myFile.print(",");
     myFile.print(temp_event.temperature);
     myFile.print(",");
     myFile.print(pressure_event.pressure);
     myFile.print(",");
     myFile.print(fishSense);
     myFile.print(",");
-
+    
+    myFile.print(fishNine);
+    myFile.print(",");
+    myFile.print(fishFour);
+    myFile.print(",");
+    myFile.print(fishSeven);
+    myFile.print(",");
+    //myFile.print(DHT.temperature);
+    //myFile.print(",");
+    //myFile.print(DHT.humidity);
+    //myFile.print(",");
+    
     myFile.print(now.day(), DEC);
     myFile.print(" ");
     myFile.print(now.hour(), DEC);
@@ -119,13 +144,6 @@ void loop() {
     // Wait one second before repeating
     delay (1000);
     
-    /*
-    Serial.print(temp_event.temperature);
-    Serial.print(",");
-    Serial.print(pressure_event.pressure);
-    Serial.print(",");
-    Serial.println(fishSense);
-    */
     
     myFile.close();
     digitalWrite(LED_PIN, LOW);
