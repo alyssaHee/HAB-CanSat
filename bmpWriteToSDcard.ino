@@ -4,7 +4,7 @@
 #include <SoftwareSerial.h>
 #include <Adafruit_BMP280.h>
 #include <RTClib.h>
-//#include <dht.h>
+#include <dht.h>
 
 
 const int fs = A1;
@@ -127,10 +127,10 @@ void loop() {
     myFile.print(",");
     myFile.print(fishSeven);
     myFile.print(",");
-    //myFile.print(DHT.temperature);
-    //myFile.print(",");
-    //myFile.print(DHT.humidity);
-    //myFile.print(",");
+    myFile.print(DHT.temperature);
+    myFile.print(",");
+    myFile.print(DHT.humidity);
+    myFile.print(",");
     
     myFile.print(now.day(), DEC);
     myFile.print(" ");
